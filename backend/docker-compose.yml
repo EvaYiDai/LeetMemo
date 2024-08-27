@@ -1,0 +1,90 @@
+version: "3.9"
+services:
+
+  # PostgreSQL Service
+  db:
+    image: postgres:13.7-alpine3.16
+    volumes:
+      - db_data:/var/lib/postgresql/data
+#      - ./src/main/docker-compose/postgresql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "leetmemo" ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: leetmemo
+      POSTGRES_PASSWORD: leetmemo
+      POSTGRES_DB: leetmemo
+    ports:
+      - "5432:5432"
+
+  # pgAdmin Service
+  pgadmin:
+    image: dpage/pgadmin4:7.5
+    environment:
+      PGADMIN_DEFAULT_EMAIL: leetmemo@evayidai.com
+      PGADMIN_DEFAULT_PASSWORD: leetmemo
+      PGADMIN_CONFIG_SERVER_MODE: False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./src/main/docker-compose/pgadmin/servers.json:/pgadmin4/servers.json
+      - ./src/main/docker-compose/pgadmin/pgpass:/var/lib/pgadmin/storage/leetmemo_evayidai.com/pgpass
+    ports:
+      - "8100:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+#  # Liquibase Service
+#  liquibase:
+#    image: liquibase/liquibase:4.23
+#    command: --defaultsFile=/liquibase/config/liquibase.properties update
+#    volumes:
+#      - ./src/main/docker-compose/liquibase:/config
+#      - ./src/main/resources/db/changelog:/liquibase/changelog
+#    depends_on:
+#      db:
+#        condition: service_healthy
+
+  # SchemaSpy Service
+  schemaspy:
+    image: schemaspy/schemaspy:6.2.4
+    volumes:
+      - schemaspy_data:/output:rw
+      - ./src/main/docker-compose/schemaspy/schemaspy.properties:/schemaspy.properties
+    command: SCHEMASPY_OUTPUT=/output /usr/local/bin/schemaspy
+#    depends_on:
+#      liquibase:
+#        condition: service_completed_successfully
+
+  nginx:
+    image: nginx:1.23.3
+    volumes:
+      - schemaspy_data:/usr/share/nginx/html/leetmemo:ro
+      - ./src/main/docker-compose/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8090:80"
+    depends_on:
+      schemaspy:
+        condition: service_completed_successfully
+
+  leetmemo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: leetmemo.local
+    depends_on:
+      db:
+        condition: service_healthy
+#      liquibase:
+#        condition: service_completed_successfully
+    env_file:
+      - ./src/main/docker-compose/envs/leetmemo.env
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data: {}
+  pgadmin_data: {}
+  schemaspy_data: {}
