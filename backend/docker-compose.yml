@@ -25,7 +25,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: leetmemo@evayidai.com
       PGADMIN_DEFAULT_PASSWORD: leetmemo
-      PGADMIN_CONFIG_SERVER_MODE: False
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./src/main/docker-compose/pgadmin/servers.json:/pgadmin4/servers.json
@@ -36,16 +36,16 @@ services:
       db:
         condition: service_healthy
 
-#  # Liquibase Service
-#  liquibase:
-#    image: liquibase/liquibase:4.23
-#    command: --defaultsFile=/liquibase/config/liquibase.properties update
-#    volumes:
-#      - ./src/main/docker-compose/liquibase:/config
-#      - ./src/main/resources/db/changelog:/liquibase/changelog
-#    depends_on:
-#      db:
-#        condition: service_healthy
+  # Liquibase Service
+  liquibase:
+    image: liquibase/liquibase:4.23
+    command: --defaultsFile=/liquibase/config/liquibase.properties update
+    volumes:
+      - ./src/main/docker-compose/liquibase:/liquibase/config
+      - ./src/main/resources/db/changelog:/liquibase/changelog
+    depends_on:
+      db:
+        condition: service_healthy
 
   # SchemaSpy Service
   schemaspy:
@@ -54,9 +54,9 @@ services:
       - schemaspy_data:/output:rw
       - ./src/main/docker-compose/schemaspy/schemaspy.properties:/schemaspy.properties
     command: SCHEMASPY_OUTPUT=/output /usr/local/bin/schemaspy
-#    depends_on:
-#      liquibase:
-#        condition: service_completed_successfully
+    depends_on:
+      liquibase:
+        condition: service_completed_successfully
 
   nginx:
     image: nginx:1.23.3
@@ -77,8 +77,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-#      liquibase:
-#        condition: service_completed_successfully
+      liquibase:
+        condition: service_completed_successfully
     env_file:
       - ./src/main/docker-compose/envs/leetmemo.env
     ports:
