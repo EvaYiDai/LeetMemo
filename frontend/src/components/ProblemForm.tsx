@@ -8,7 +8,7 @@ interface ProblemFormProps {
 function ProblemForm({ onAddProblem }: ProblemFormProps) {
     const [name, setName] = useState("");
     const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -18,7 +18,7 @@ function ProblemForm({ onAddProblem }: ProblemFormProps) {
         // Clear form
         setName("");
         setDifficulty("Easy");
-        setDate("");
+        setDate(new Date().toISOString().split('T')[0]);
     };
 
     return (

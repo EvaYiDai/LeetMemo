@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProblemForm from "../ProblemForm";
 
@@ -23,7 +23,9 @@ describe("ProblemForm", () => {
         // Fill out the form
         await user.type(screen.getByLabelText(/Problem Name/i), "Two Sum");
         await user.selectOptions(screen.getByLabelText(/Difficulty/i), "Easy");
-        await user.type(screen.getByLabelText(/Date Solved/i), "2025-03-24");
+        fireEvent.change(screen.getByLabelText(/Date Solved/i), {
+            target: { value: "2025-03-24" },
+        });
 
         // Submit the form
         await user.click(screen.getByRole("button", { name: /Add Problem/i }));
@@ -60,6 +62,6 @@ describe("ProblemForm", () => {
         // Check that all fields are reset
         expect(nameInput).toHaveValue(""); // text input cleared
         expect(difficultySelect).toHaveValue("Easy"); // select reset to default
-        expect(dateInput).toHaveValue(""); // date cleared
+        expect(dateInput).toHaveValue(new Date().toISOString().split("T")[0]); // date cleared
     });
 });
