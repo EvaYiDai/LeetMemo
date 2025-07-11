@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { FilterProvider } from "../../context/FilterContext";
 import ProblemListPage from "../ProblemListPage";
 import React from "react";
@@ -136,5 +136,51 @@ describe("ProblemListPage", () => {
                 "Longest Substring Without Repeating Characters"
             )
         ).toBeInTheDocument();
+    });
+
+    it("adds when new problem is added", async () => {
+        const user = userEvent.setup();
+        renderPage();
+
+        const table = screen.getByRole("table");
+        const tableUtils = within(table);
+
+        expect(tableUtils.queryByText("Three Sum")).not.toBeInTheDocument();
+
+        const form = screen.getByRole("form");
+        const formUtils = within(form);
+        const nameInput = formUtils.getByLabelText(/Problem Name/i);
+
+        await user.type(nameInput, "Three Sum");
+
+        await user.click(screen.getByRole("button", { name: /Add Problem/i }));
+
+        expect(tableUtils.getByText("Three Sum")).toBeInTheDocument();
+    });
+
+    it("updates date when same problem is added", async () => {
+        const user = userEvent.setup();
+        renderPage();
+
+        const table = screen.getByRole("table");
+        const tableUtils = within(table);
+
+        expect(tableUtils.getByText("Two Sum")).toBeInTheDocument();
+        expect(tableUtils.getByText("2025-03-01")).toBeInTheDocument();
+
+        const form = screen.getByRole("form");
+        const formUtils = within(form);
+        const nameInput = formUtils.getByLabelText(/Problem Name/i);
+        const dateInput = formUtils.getByLabelText(/Date Solved/i);
+
+        await user.type(nameInput, "Two Sum");
+        fireEvent.change(dateInput, {
+            target: { value: "2025-03-24" },
+        });
+
+        await user.click(screen.getByRole("button", { name: /Add Problem/i }));
+
+        expect(tableUtils.getByText("2025-03-24")).toBeInTheDocument();
+        expect(tableUtils.queryByText("2025-03-01")).not.toBeInTheDocument();
     });
 });

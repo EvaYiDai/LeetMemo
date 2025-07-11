@@ -8,21 +8,21 @@ interface ProblemFormProps {
 function ProblemForm({ onAddProblem }: ProblemFormProps) {
     const [name, setName] = useState("");
     const [difficulty, setDifficulty] = useState<Difficulty>("Easy");
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        
+
         onAddProblem({ name, difficulty, date });
 
         // Clear form
         setName("");
         setDifficulty("Easy");
-        setDate(new Date().toISOString().split('T')[0]);
+        setDate(new Date().toISOString().split("T")[0]);
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} role="form">
             <label>
                 Problem Name:
                 <input
@@ -36,7 +36,9 @@ function ProblemForm({ onAddProblem }: ProblemFormProps) {
                 Difficulty:
                 <select
                     value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+                    onChange={(e) =>
+                        setDifficulty(e.target.value as Difficulty)
+                    }
                 >
                     <option>Easy</option>
                     <option>Medium</option>

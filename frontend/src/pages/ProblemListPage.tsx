@@ -30,7 +30,17 @@ function ProblemListPage() {
     }, [problems]);
 
     const addProblem = (problem: Problem) => {
-        setProblems([...problems, problem]);
+        const copy = [...problems];
+        // Search takes O(n) time, can refactor to use Sets later
+        let found = false;
+        for (let i = 0; i < copy.length; i++) {
+            if (copy[i].name === problem.name) {
+                copy[i].date = problem.date;
+                found = true;
+            }
+        }
+        if (!found) copy.push(problem);
+        setProblems(copy);
     };
 
     const handleDelete = (index: number) => {
