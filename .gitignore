@@ -1,0 +1,43 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+leetmemo-frontend/node_modules
+leetmemo-frontend/.pnp
+leetmemo-frontend/.pnp.*
+leetmemo-frontend/.yarn/*
+!leetmemo-frontend/.yarn/patches
+!leetmemo-frontend/.yarn/plugins
+!leetmemo-frontend/.yarn/releases
+!leetmemo-frontend/.yarn/versions
+
+# testing
+leetmemo-frontend/coverage
+
+# next.js
+leetmemo-frontend/.next/
+leetmemo-frontend/out/
+
+# production
+leetmemo-frontend/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+leetmemo-frontend/npm-debug.log*
+leetmemo-frontend/yarn-debug.log*
+leetmemo-frontend/yarn-error.log*
+leetmemo-frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+db/.env
+*.env
+*.env.local
+
+# vercel
+leetmemo-frontend/.vercel
+
+# typescript
+leetmemo-frontend/*.tsbuildinfo
+leetmemo-frontend/next-env.d.ts

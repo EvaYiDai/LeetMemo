@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  # PostgreSQL Service
+  postgres:
+    image: postgres:16
+    container_name: leetmemo_postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-leetmemo} -d ${POSTGRES_DB:-leetmemo_db}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-leetmemo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-leetmemo_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-leetmemo_db}
+    ports:
+      - "127.0.0.1:${PG_HOST_PORT:-5432}:5432"
+
+volumes:
+  pgdata:
